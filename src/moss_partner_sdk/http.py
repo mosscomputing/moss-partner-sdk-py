@@ -1,7 +1,8 @@
 """HTTP client for MOSS Partner API."""
 
 import asyncio
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
+from types import TracebackType
 
 import httpx
 
@@ -78,7 +79,7 @@ class HTTPClient:
         """
         client = await self._get_client()
 
-        last_error = None
+        last_error: Optional[Exception] = None
         for attempt in range(self.retries + 1):
             try:
                 response = await client.request(
@@ -164,16 +165,21 @@ class HTTPClient:
         except httpx.RequestError as e:
             raise MossNetworkError(f"Request failed: {e}")
 
-    async def close(self):
+    async def close(self) -> None:
         """Close the HTTP client."""
         if self._client:
             await self._client.aclose()
             self._client = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "HTTPClient":
         """Async context manager entry."""
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         """Async context manager exit."""
         await self.close()

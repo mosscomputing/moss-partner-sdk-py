@@ -80,8 +80,9 @@ class CustomersResource:
         API field mapping (from TypeScript SDK customers.ts:57-62):
         - API: token → SDK: session_token
         """
+        token = api_response.get("token") or api_response.get("sessionToken") or ""
         return SessionResponse(
-            session_token=api_response.get("token") or api_response.get("sessionToken"),
+            session_token=token,
             expires_at=api_response["expiresAt"],
             metadata=api_response.get("metadata"),
         )
