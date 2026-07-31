@@ -219,11 +219,11 @@ class TestComplianceReports:
             # (actual API behavior may vary)
 
 
-@pytest.mark.integration
 class TestErrorHandling:
     """Error handling tests."""
 
     @pytest.mark.asyncio
+    @pytest.mark.integration
     async def test_api_error_on_4xx(self, skip_if_no_api_key, test_config):
         """Test that 4xx errors raise MossAPIError."""
         async with MossPartner(**test_config) as moss:
