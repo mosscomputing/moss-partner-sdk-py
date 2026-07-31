@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from types import TracebackType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -94,7 +94,7 @@ class HTTPClient:
                     params=params,
                 )
                 response.raise_for_status()
-                return response.json()
+                return cast(dict[str, Any], response.json())
 
             except httpx.HTTPStatusError as e:
                 # Don't retry 4xx errors (client errors)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from typing import Any
 
@@ -176,7 +177,7 @@ class CustomersResource:
             ... )
             >>> print(customer.sandbox_token)
         """
-        body = {
+        body: dict[str, Any] = {
             "externalId": external_id,
             "name": name,
         }
@@ -304,7 +305,7 @@ class CustomersResource:
         Returns:
             Suspended customer
         """
-        body = {"reason": reason}
+        body: dict[str, Any] = {"reason": reason}
         if grace_period_hours is not None:
             body["gracePeriodHours"] = grace_period_hours
 
@@ -383,7 +384,7 @@ class CustomersResource:
         self,
         customer_id: str,
         format: str = "pdf",
-        frameworks: list | None = None,
+        frameworks: Sequence[str] | None = None,
     ) -> ComplianceReportResponse:
         """
         Generate ML-DSA-44 signed compliance report.

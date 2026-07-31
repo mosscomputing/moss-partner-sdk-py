@@ -24,7 +24,7 @@ class Governance(BaseModel):
 
     jurisdictions: list[str] = Field(default_factory=list)
     frameworks: list[str] = Field(default_factory=list)
-    settings: dict[str, Any | None] = None
+    settings: dict[str, Any] | None = None
 
 
 class ResourceLimits(BaseModel):
@@ -104,7 +104,7 @@ class SessionResponse(BaseModel):
 
     session_token: str  # Mapped from API's token field
     expires_at: datetime
-    metadata: dict[str, Any | None] = None
+    metadata: dict[str, Any] | None = None
 
 
 class ComplianceReportResponse(BaseModel):
@@ -115,7 +115,7 @@ class ComplianceReportResponse(BaseModel):
     key_id: str
     generated_at: datetime
     download_url: str | None = None
-    data: dict[str, Any | None] = None
+    data: dict[str, Any] | None = None
 
 
 class Webhook(BaseModel):
