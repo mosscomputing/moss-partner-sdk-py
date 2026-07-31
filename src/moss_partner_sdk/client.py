@@ -1,7 +1,12 @@
 """Main MOSS Partner SDK client."""
 
-from typing import Optional, Type
+from __future__ import annotations
+
 from types import TracebackType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 from .analytics import AnalyticsResource
 from .customers import CustomersResource
@@ -80,22 +85,22 @@ class MossPartner:
             response = await self._http.request("GET", "/health")
             status = response.get("status")
             return bool(status == "ok")
-        except Exception:
+        except (OSError, ValueError):
             return False
 
     async def close(self) -> None:
         """Close the HTTP client and release resources."""
         await self._http.close()
 
-    async def __aenter__(self) -> "MossPartner":
+    async def __aenter__(self) -> Self:
         """Async context manager entry."""
         return self
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Async context manager exit."""
         await self.close()

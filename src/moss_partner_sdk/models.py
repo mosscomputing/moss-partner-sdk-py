@@ -1,8 +1,10 @@
 """Pydantic models for MOSS Partner SDK."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,17 +22,17 @@ class CustomerStatus(str, Enum):
 class Governance(BaseModel):
     """Governance configuration for a customer."""
 
-    jurisdictions: List[str] = Field(default_factory=list)
-    frameworks: List[str] = Field(default_factory=list)
-    settings: Optional[Dict[str, Any]] = None
+    jurisdictions: list[str] = Field(default_factory=list)
+    frameworks: list[str] = Field(default_factory=list)
+    settings: dict[str, Any | None] = None
 
 
 class ResourceLimits(BaseModel):
     """Resource limits for a customer."""
 
     agents: int
-    envelopes_per_month: Optional[int] = None
-    policies: Optional[int] = None
+    envelopes_per_month: int | None = None
+    policies: int | None = None
 
 
 class ComplianceIssue(BaseModel):
@@ -40,7 +42,7 @@ class ComplianceIssue(BaseModel):
     severity: str
     description: str
     framework: str
-    remediation_url: Optional[str] = None
+    remediation_url: str | None = None
 
 
 class ComplianceInfo(BaseModel):
@@ -48,7 +50,7 @@ class ComplianceInfo(BaseModel):
 
     score: int
     status: str
-    issues: List[ComplianceIssue] = Field(default_factory=list)
+    issues: list[ComplianceIssue] = Field(default_factory=list)
     last_assessment: datetime
 
 
@@ -57,8 +59,8 @@ class BillingInfo(BaseModel):
 
     tier: str
     billing_email: str
-    stripe_customer_id: Optional[str] = None
-    current_mrr: Optional[float] = None
+    stripe_customer_id: str | None = None
+    current_mrr: float | None = None
 
 
 class Customer(BaseModel):
@@ -69,16 +71,16 @@ class Customer(BaseModel):
     name: str
     email: str
     status: CustomerStatus
-    sandbox_token: Optional[str] = None  # Mapped from credentials.customerToken.token
-    production_token: Optional[str] = None  # Mapped from credentials.productionToken.token
+    sandbox_token: str | None = None  # Mapped from credentials.customerToken.token
+    production_token: str | None = None  # Mapped from credentials.productionToken.token
     governance: Governance
     limits: ResourceLimits
     compliance: ComplianceInfo
-    billing: Optional[BillingInfo] = None
+    billing: BillingInfo | None = None
     created_at: datetime
     updated_at: datetime
-    promoted_at: Optional[datetime] = None
-    suspended_at: Optional[datetime] = None
+    promoted_at: datetime | None = None
+    suspended_at: datetime | None = None
 
 
 class PaginationInfo(BaseModel):
@@ -93,7 +95,7 @@ class PaginationInfo(BaseModel):
 class CustomerListResponse(BaseModel):
     """Response from list customers endpoint."""
 
-    data: List[Customer]
+    data: list[Customer]
     pagination: PaginationInfo
 
 
@@ -102,7 +104,7 @@ class SessionResponse(BaseModel):
 
     session_token: str  # Mapped from API's token field
     expires_at: datetime
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any | None] = None
 
 
 class ComplianceReportResponse(BaseModel):
@@ -112,8 +114,8 @@ class ComplianceReportResponse(BaseModel):
     signature: str
     key_id: str
     generated_at: datetime
-    download_url: Optional[str] = None
-    data: Optional[Dict[str, Any]] = None
+    download_url: str | None = None
+    data: dict[str, Any | None] = None
 
 
 class Webhook(BaseModel):
@@ -121,7 +123,7 @@ class Webhook(BaseModel):
 
     id: str
     url: str
-    events: List[str]
+    events: list[str]
     secret: str
     active: bool = True
     created_at: datetime
@@ -131,7 +133,7 @@ class Webhook(BaseModel):
 class WebhookListResponse(BaseModel):
     """Response from list webhooks endpoint."""
 
-    data: List[Webhook]
+    data: list[Webhook]
 
 
 class AnalyticsCustomers(BaseModel):

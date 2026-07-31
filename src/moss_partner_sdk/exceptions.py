@@ -1,6 +1,6 @@
 """Custom exceptions for MOSS Partner SDK."""
 
-from typing import Optional
+from __future__ import annotations
 
 
 class MossError(Exception):
@@ -18,8 +18,8 @@ class MossAPIError(MossError):
         self,
         message: str,
         status_code: int,
-        code: Optional[str] = None,
-        response_body: Optional[str] = None,
+        code: str | None = None,
+        response_body: str | None = None,
     ):
         self.status_code = status_code
         self.code = code or "unknown_error"
@@ -33,16 +33,13 @@ class MossAPIError(MossError):
 class MossNetworkError(MossError):
     """Exception raised when network request fails."""
 
-    pass
 
 
 class MossValidationError(MossError):
     """Exception raised when input validation fails."""
 
-    pass
 
 
 class MossParseError(MossError):
     """Exception raised when response parsing fails."""
 
-    pass

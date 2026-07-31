@@ -1,9 +1,11 @@
 """Customer management resource for MOSS Partner SDK."""
 
+from __future__ import annotations
+
 import json
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any
 
 from .exceptions import MossParseError
 from .http import HTTPClient
@@ -26,7 +28,7 @@ class CustomersResource:
     def __init__(self, http: HTTPClient):
         self.http = http
 
-    def _map_customer(self, api_response: Dict[str, Any]) -> Customer:
+    def _map_customer(self, api_response: dict[str, Any]) -> Customer:
         """
         Map API response to Customer model.
 
@@ -73,7 +75,7 @@ class CustomersResource:
             suspended_at=api_response.get("suspendedAt"),
         )
 
-    def _map_session_response(self, api_response: Dict[str, Any]) -> SessionResponse:
+    def _map_session_response(self, api_response: dict[str, Any]) -> SessionResponse:
         """
         Map API session response to SessionResponse model.
 
@@ -106,7 +108,7 @@ class CustomersResource:
         try:
             # Convert binary to text (ignore decoding errors for binary PDF content)
             pdf_text = pdf_bytes.decode("utf-8", errors="ignore")
-        except Exception as e:
+        except (UnicodeDecodeError, AttributeError) as e:
             raise MossParseError(f"Failed to decode PDF: {e}")
 
         # Find the signature block
@@ -147,8 +149,8 @@ class CustomersResource:
         self,
         external_id: str,
         name: str,
-        email: Optional[str] = None,
-        governance: Optional[Dict[str, Any]] = None,
+        email: str | None = None,
+        governance: dict[str, Any] | None = None,
     ) -> Customer:
         """
         Create a new customer.
@@ -188,7 +190,7 @@ class CustomersResource:
 
     async def list(
         self,
-        status: Optional[str] = None,
+        status: str | None = None,
         limit: int = 100,
         offset: int = 0,
     ) -> CustomerListResponse:
@@ -203,7 +205,7 @@ class CustomersResource:
         Returns:
             Paginated list of customers
         """
-        params: Dict[str, Any] = {"limit": limit, "offset": offset}
+        params: dict[str, Any] = {"limit": limit, "offset": offset}
         if status:
             params["status"] = status
 
@@ -233,8 +235,8 @@ class CustomersResource:
     async def update(
         self,
         customer_id: str,
-        limits: Optional[Dict[str, Any]] = None,
-        governance: Optional[Dict[str, Any]] = None,
+        limits: dict[str, Any] | None = None,
+        governance: dict[str, Any] | None = None,
     ) -> Customer:
         """
         Update a customer's configuration.
@@ -261,8 +263,8 @@ class CustomersResource:
     async def promote(
         self,
         customer_id: str,
-        attestation: Dict[str, Any],
-        billing: Dict[str, Any],
+        attestation: dict[str, Any],
+        billing: dict[str, Any],
     ) -> Customer:
         """
         Promote customer to production.
@@ -289,7 +291,7 @@ class CustomersResource:
         self,
         customer_id: str,
         reason: str,
-        grace_period_hours: Optional[int] = None,
+        grace_period_hours: int | None = None,
     ) -> Customer:
         """
         Suspend a customer.
@@ -314,7 +316,7 @@ class CustomersResource:
     async def reactivate(
         self,
         customer_id: str,
-        resolution: Dict[str, Any],
+        resolution: dict[str, Any],
     ) -> Customer:
         """
         Reactivate a suspended customer.
@@ -381,7 +383,7 @@ class CustomersResource:
         self,
         customer_id: str,
         format: str = "pdf",
-        frameworks: Optional[list] = None,
+        frameworks: list | None = None,
     ) -> ComplianceReportResponse:
         """
         Generate ML-DSA-44 signed compliance report.
@@ -398,7 +400,7 @@ class CustomersResource:
             For PDF format, signature is extracted from PDF trailer.
             ML-DSA-44 signatures are ~3000-5000 chars (from LC018).
         """
-        params: Dict[str, Any] = {"format": format}
+        params: dict[str, Any] = {"format": format}
         if frameworks:
             params["frameworks"] = ",".join(frameworks)
 

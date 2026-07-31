@@ -1,8 +1,13 @@
 """HTTP client for MOSS Partner API."""
 
+from __future__ import annotations
+
 import asyncio
-from typing import Any, Dict, Optional, Type
 from types import TracebackType
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 import httpx
 
@@ -38,7 +43,7 @@ class HTTPClient:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.retries = retries
-        self._client: Optional[httpx.AsyncClient] = None
+        self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
         """Get or create async HTTP client."""
@@ -58,9 +63,9 @@ class HTTPClient:
         self,
         method: str,
         path: str,
-        body: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        body: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Make an HTTP request with retry logic.
 
@@ -79,7 +84,7 @@ class HTTPClient:
         """
         client = await self._get_client()
 
-        last_error: Optional[Exception] = None
+        last_error: Exception | None = None
         for attempt in range(self.retries + 1):
             try:
                 response = await client.request(
@@ -99,7 +104,7 @@ class HTTPClient:
                         error_data = e.response.json()
                         error_message = error_data.get("error", e.response.text)
                         error_code = error_data.get("code", "api_error")
-                    except Exception:
+                    except (ValueError, httpx.DecodingError):
                         error_message = e.response.text
                         error_code = "api_error"
 
@@ -151,7 +156,7 @@ class HTTPClient:
                 error_data = e.response.json()
                 error_message = error_data.get("error", e.response.text)
                 error_code = error_data.get("code", "api_error")
-            except Exception:
+            except (ValueError, httpx.DecodingError):
                 error_message = e.response.text
                 error_code = "api_error"
 
@@ -171,15 +176,15 @@ class HTTPClient:
             await self._client.aclose()
             self._client = None
 
-    async def __aenter__(self) -> "HTTPClient":
+    async def __aenter__(self) -> Self:
         """Async context manager entry."""
         return self
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Async context manager exit."""
         await self.close()

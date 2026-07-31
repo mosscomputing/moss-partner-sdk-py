@@ -1,6 +1,6 @@
 """Webhook management resource for MOSS Partner SDK."""
 
-from typing import List
+from __future__ import annotations
 
 from .http import HTTPClient
 from .models import Webhook, WebhookListResponse
@@ -12,7 +12,7 @@ class WebhooksResource:
     def __init__(self, http: HTTPClient):
         self.http = http
 
-    async def create(self, url: str, events: List[str]) -> Webhook:
+    async def create(self, url: str, events: list[str]) -> Webhook:
         """
         Create a webhook subscription.
 
@@ -81,8 +81,8 @@ def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> boo
         >>> if not is_valid:
         ...     return Response(status=401)
     """
-    import hmac
     import hashlib
+    import hmac
 
     expected = hmac.new(
         key=secret.encode("utf-8"),
