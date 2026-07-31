@@ -2,15 +2,19 @@
 
 import os
 import uuid
+import warnings
 
 import pytest
 
-# Test configuration
-TEST_API_KEY = os.environ.get("MOSS_PARTNER_KEY")
+# Test configuration (matches TypeScript SDK setup.ts pattern)
+TEST_API_KEY = os.environ.get("MOSS_PARTNER_KEY", "")
 TEST_BASE_URL = os.environ.get(
     "MOSS_BASE_URL",
-    "https://moss-api-staging-837703369688.us-central1.run.app",  # Staging (LC014, LC010)
+    "https://api.mosscomputing.com",  # Production API (matches TypeScript)
 )
+
+# Test prefix to avoid collisions
+TEST_PREFIX = f"test_sdk_{int(os.environ.get('GITHUB_RUN_ID', '0')) or uuid.uuid4().hex[:8]}"
 
 
 def pytest_configure(config):
@@ -18,6 +22,13 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "integration: mark test as integration test (requires API key)"
     )
+
+    # Warn if no API key (matches TypeScript beforeAll pattern)
+    if not TEST_API_KEY:
+        warnings.warn(
+            "⚠️  MOSS_PARTNER_KEY not set. Integration tests will be skipped.",
+            UserWarning,
+        )
 
 
 @pytest.fixture
@@ -30,7 +41,7 @@ def skip_if_no_api_key():
 @pytest.fixture
 def unique_id():
     """Generate unique ID for test resources."""
-    return f"pytest_{uuid.uuid4().hex[:8]}"
+    return f"{TEST_PREFIX}_{uuid.uuid4().hex[:8]}"
 
 
 @pytest.fixture
