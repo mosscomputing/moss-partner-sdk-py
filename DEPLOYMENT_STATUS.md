@@ -66,7 +66,28 @@ git push -u origin main
 - Repository created: https://github.com/mosscomputing/moss-partner-sdk-py
 - All code pushed to main
 - CI passing: Python 3.9, 3.10, 3.11, 3.12 (all green)
-- Latest commit: f4a4e8d (Python 3.9 compatibility fix)
+- Latest commit: 5bd601e (Enable CI on staging branch)
+
+---
+
+### Step 1.5: Create Staging Branch ✅ **COMPLETE**
+
+```bash
+git checkout -b staging
+git push -u origin staging
+git checkout main
+```
+
+**Status**: ✅ Complete
+- Staging branch created and pushed
+- CI configured to run on both main and staging
+- Staging CI behavior:
+  - ✅ Tests (Python 3.9-3.12): Runs on every push
+  - ❌ Integration tests: Skipped (main only)
+  - ❌ PyPI publish: Skipped (main only)
+- Latest staging CI: All tests passing ✅
+
+**Deployment Pattern**: `main → staging → production`
 
 ---
 

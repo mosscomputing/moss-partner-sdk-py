@@ -260,6 +260,32 @@ export MOSS_PARTNER_KEY="prt_xxx"
 pytest tests/ -v -m integration
 ```
 
+### Deployment Workflow
+
+The SDK follows the MOSS staged deployment pattern:
+
+```
+main → staging → production
+```
+
+**Branches:**
+- `main`: Development branch (all CI checks, integration tests, PyPI publish)
+- `staging`: Pre-production validation (tests only, no publish)
+
+**CI Behavior:**
+
+| Job | main | staging |
+|-----|------|---------|
+| Tests (Python 3.9-3.12) | ✅ Runs | ✅ Runs |
+| Integration Tests | ✅ Runs | ❌ Skipped |
+| Publish to PyPI | ✅ Runs | ❌ Skipped |
+
+**Workflow:**
+1. Develop on feature branches
+2. Merge to `main` → full CI + publish
+3. Merge to `staging` → test validation only
+4. Production releases via PyPI
+
 ## Requirements
 
 - Python 3.9+
